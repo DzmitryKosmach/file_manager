@@ -2,7 +2,6 @@ import { createReadStream } from "fs";
 import { access } from "fs/promises";
 import { resolve } from "path";
 import readline from "readline";
-//import { pipeline } from "stream/promises";
 import { OPERATION_FAILED } from "../constants.js";
 
 export const cat = async (currentPath, pathFile) => {
@@ -10,8 +9,6 @@ export const cat = async (currentPath, pathFile) => {
     const pathFileToRead = resolve(currentPath, pathFile);
 
     await access(pathFileToRead);
-
-    //pipeline(createReadStream(pathFileToRead), process.stdout);
 
     const file = readline.createInterface({
       input: createReadStream(pathFileToRead),

@@ -1,6 +1,7 @@
-import { copyFile } from "fs/promises";
-import { constants } from "fs";
+import { createReadStream, createWriteStream } from "fs";
 import { resolve, dirname, basename  } from "path";
+import { pipeline } from "stream/promises";
+import { add } from "../commands/add.js";
 import { OPERATION_FAILED } from "../constants.js";
 import { isFilePathExist } from "../utils/isFilePathExist.js";
 
@@ -12,11 +13,16 @@ export const cp = async (currentPath, filePath, PathTo) => {
     const fileFullPathTo = resolve(dirnameFrom, PathTo, __basename);
     const dirnameTo = dirname(fileFullPathTo);
   
-    if (!(await isFilePathExist(fileFullPathFrom))) throw new Error();
     if (!(await isFilePathExist(dirnameTo))) throw new Error();
-        
-    await copyFile(fileFullPathFrom, fileFullPathTo, constants.COPYFILE_EXCL);
     
+    if (!(await isFilePathExist(fileFullPathFrom))) {
+      throw new Error();
+    } else {
+      add(currentPath, fileFullPathTo);
+    }
+
+    await pipeline(createReadStream(fileFullPathFrom), createWriteStream(fileFullPathTo));
+            
   } catch (err) {
     throw new Error(OPERATION_FAILED);
   }
